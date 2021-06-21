@@ -139,15 +139,6 @@ class GoogleStorageAdapter extends AbstractAdapter
     protected function getOptionsFromConfig(Config $config)
     {
         $options = [];
-
-        if (empty($this->bucket->info()['iamConfiguration']['uniformBucketLevelAccess']['enabled'])) {
-            if ($visibility = $config->get('visibility')) {
-                $options['predefinedAcl'] = $this->getPredefinedAclForVisibility($visibility);
-            } else {
-                $options['predefinedAcl'] = $this->getPredefinedAclForVisibility(AdapterInterface::VISIBILITY_PRIVATE);
-            }
-        }
-
         if ($metadata = $config->get('metadata')) {
             $options['metadata'] = $metadata;
         }
@@ -228,8 +219,7 @@ class GoogleStorageAdapter extends AbstractAdapter
             $visibility = $this->getRawVisibility($path);
 
             $options = [
-                'name' => $newpath,
-                'predefinedAcl' => $this->getPredefinedAclForVisibility($visibility),
+                'name' => $newpath
             ];
         
         } else {
@@ -535,15 +525,5 @@ class GoogleStorageAdapter extends AbstractAdapter
     {
         $path = $this->applyPathPrefix($path);
         return $this->bucket->object($path);
-    }
-
-    /**
-     * @param string $visibility
-     *
-     * @return string
-     */
-    protected function getPredefinedAclForVisibility($visibility)
-    {
-        return $visibility === AdapterInterface::VISIBILITY_PUBLIC ? 'publicRead' : 'projectPrivate';
     }
 }
